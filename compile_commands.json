@@ -1,0 +1,97 @@
+[
+  {
+    "file": "src/arena.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-O0",
+      "-MMD",
+      "-MP",
+      "-I./include",
+      "-c",
+      "src/arena.c",
+      "-o",
+      "build/obj/arena.o"
+    ],
+    "directory": "/home/tori/projects/linalg",
+    "output": "build/obj/arena.o"
+  },
+  {
+    "file": "src/main.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-O0",
+      "-MMD",
+      "-MP",
+      "-I./include",
+      "-c",
+      "src/main.c",
+      "-o",
+      "build/obj/main.o"
+    ],
+    "directory": "/home/tori/projects/linalg",
+    "output": "build/obj/main.o"
+  },
+  {
+    "file": "src/matrix.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-O0",
+      "-MMD",
+      "-MP",
+      "-I./include",
+      "-c",
+      "src/matrix.c",
+      "-o",
+      "build/obj/matrix.o"
+    ],
+    "directory": "/home/tori/projects/linalg",
+    "output": "build/obj/matrix.o"
+  },
+  {
+    "file": "src/operations.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-O0",
+      "-MMD",
+      "-MP",
+      "-I./include",
+      "-c",
+      "src/operations.c",
+      "-o",
+      "build/obj/operations.o"
+    ],
+    "directory": "/home/tori/projects/linalg",
+    "output": "build/obj/operations.o"
+  },
+  {
+    "file": "src/vector.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-O0",
+      "-MMD",
+      "-MP",
+      "-I./include",
+      "-c",
+      "src/vector.c",
+      "-o",
+      "build/obj/vector.o"
+    ],
+    "directory": "/home/tori/projects/linalg",
+    "output": "build/obj/vector.o"
+  }
+]
