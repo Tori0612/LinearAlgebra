@@ -1,8 +1,8 @@
 #include "definitions.h"
 #include "vector.h"
 
-Vector vector_create(Arena arena, sz size) {
-    Vector v = PUSH_STRUCT(arena, struct vector_type, true);
+LVector vector_create(Arena arena, sz size) {
+    LVector v = PUSH_STRUCT(arena, struct vector_type, true);
     if (!v) terminate("Couldn't allocate vector.");
 
     v->size = size;
@@ -12,9 +12,9 @@ Vector vector_create(Arena arena, sz size) {
     return v;
 }
 
-Vector vector_add(Arena arena, Vector a, Vector b) {
+LVector vector_add(Arena arena, LVector a, LVector b) {
     if (a->size != b->size) terminate("Can't add vectors of different length.");
-    Vector v = vector_create(arena, a->size);
+    LVector v = vector_create(arena, a->size);
 
     for (u8 i = 0; i < v->size; i++) {
         v->data[i] = a->data[i] + b->data[i];
@@ -23,8 +23,8 @@ Vector vector_add(Arena arena, Vector a, Vector b) {
     return v;
 }
 
-Vector vector_multiply(Arena arena, Vector a, i16 k) {
-    Vector v = vector_create(arena, a->size);
+LVector vector_multiply(Arena arena, LVector a, i16 k) {
+    LVector v = vector_create(arena, a->size);
     for (u8 i = 0; i < v->size; i++) {
         v->data[i] *= k;
     }
@@ -32,7 +32,7 @@ Vector vector_multiply(Arena arena, Vector a, i16 k) {
     return v;
 }
 
-i16 inner_product(Vector a, Vector b) {
+i16 inner_product(LVector a, LVector b) {
     i16 result = 0;
     for (sz i = 0; i < a->size; i++) {
         result += a->data[i] * b->data[i];
@@ -41,7 +41,7 @@ i16 inner_product(Vector a, Vector b) {
     return result;
 }
 
-void vector_scale(Vector v, i16 scalar) {
+void vector_scale(LVector v, i16 scalar) {
     for (sz i = 0; i < v->size; i++) {
         v->data[i] *= scalar;
     }
