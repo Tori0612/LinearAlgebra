@@ -1,5 +1,62 @@
 [
   {
+    "file": "src/math/transformation.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-O0",
+      "-MMD",
+      "-MP",
+      "-I./include",
+      "-c",
+      "src/math/transformation.c",
+      "-o",
+      "build/obj/math/transformation.o"
+    ],
+    "directory": "/home/tori/projects/linalg",
+    "output": "build/obj/math/transformation.o"
+  },
+  {
+    "file": "src/math/operations.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-O0",
+      "-MMD",
+      "-MP",
+      "-I./include",
+      "-c",
+      "src/math/operations.c",
+      "-o",
+      "build/obj/math/operations.o"
+    ],
+    "directory": "/home/tori/projects/linalg",
+    "output": "build/obj/math/operations.o"
+  },
+  {
+    "file": "src/math/systems.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-O0",
+      "-MMD",
+      "-MP",
+      "-I./include",
+      "-c",
+      "src/math/systems.c",
+      "-o",
+      "build/obj/math/systems.o"
+    ],
+    "directory": "/home/tori/projects/linalg",
+    "output": "build/obj/math/systems.o"
+  },
+  {
     "file": "src/main.c",
     "arguments": [
       "/usr/bin/gcc",

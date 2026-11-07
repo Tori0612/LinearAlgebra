@@ -1,8 +1,22 @@
+#include "base.h"
 #include "definitions.h"
+#include <math.h>
 #include "matrix.h"
 
-static sz get_index(sz cols, u8 i, u8 j) {
+sz get_index(sz cols, u8 i, u8 j) {
     return i * cols + j;
+}
+
+static void swap_rows(LMatrix m, sz row1, sz row2) {
+    if (row1 == row2) return;
+    for (sz j = 0; j < m->cols; j++) {
+        sz idx1 = get_index(m->cols, row1, j);
+        sz idx2 = get_index(m->cols, row2, j);
+
+        f32 tmp = m->data[idx1];
+        m->data[idx1] = m->data[idx2];
+        m->data[idx2] = tmp;
+    }
 }
 
 LMatrix matrix_create(Arena arena, sz rows, sz cols) {
@@ -13,15 +27,15 @@ LMatrix matrix_create(Arena arena, sz rows, sz cols) {
     m->rows = rows;
     m->cols = cols;
 
-    m->data = PUSH_ARRAY(arena, i16, rows * cols, true);
+    m->data = PUSH_ARRAY(arena, f32, rows * cols, true);
     if (!m->data) terminate("Couldn't allocate matrix array.");
     return m;
 }
 
-static void matrix_modify(LMatrix m, u8 row, u8 col, i16 value) {
-    u8 index = get_index(m->cols, row, col);
-    m->data[index] = value;
-}
+// static void matrix_modify(LMatrix m, u8 row, u8 col, i16 value) {
+//     u8 index = get_index(m->cols, row, col);
+//     m->data[index] = value;
+// }
 
 void matrix_generate(LMatrix m) {
     for (u8 i = 0; i < m->rows; i++) {
@@ -39,7 +53,7 @@ void matrix_insert(LMatrix m) {
         printf("Row %u (enter %zu values separated by space): ", i+1, m->cols);
         for (u8 j = 0; j < m->cols; j++) {
             sz index = get_index(m->cols, i, j);
-            scanf("%hd", &m->data[index]);
+            scanf("%f", &m->data[index]);
         }
     }
 }
@@ -85,9 +99,65 @@ void matrix_print(LMatrix m) {
     for (u8 i = 0; i < m->rows; i++) {
         for (u8 j = 0; j < m->cols; j++) {
             u8 index = get_index(m->cols, i, j);
-            printf("%d ", m->data[index]);
+            printf("%.2f  ", m->data[index]);
         }
         printf("\n");
     }
     printf("\n");
+}
+
+f32 matrix_determinant(Arena arena, LMatrix m) {
+    if (m->rows != m->cols) terminate("Determinant can only be calculated for square matrices.");
+
+    sz n = m->rows;
+
+    if (n == 2) {
+        return m->data[0] * m->data[3] - (m->data[1] * m->data[2]);
+    }
+    if (n == 3) {
+        return m->data[0] * (m->data[4] * m->data[8] - (m->data[5] * m->data[7])) -
+               m->data[1] * (m->data[3] * m->data[8] - (m->data[5] * m->data[6])) +
+               m->data[2] * (m->data[3] * m->data[7] - (m->data[4] * m->data[6]));
+    }
+
+    LMatrix clone = matrix_create(arena, m->rows, m->cols);
+    for (sz i = 0; i < n * n; i ++) {
+        clone->data[i] = m->data[i];
+    }
+    f32 det = 1.0f;
+
+    for (sz i = 0; i < n; i++) {
+        sz max_row = i;
+        f32 max_val = fabs(clone->data[get_index(clone->cols, i, i)]);
+        for (sz k = i + 1; k < n; k++) {
+            f32 curr_val = fabs(clone->data[get_index(clone->cols, k, i)]);
+            if (curr_val > max_val) {
+                max_val = curr_val;
+                max_row = k;
+            }
+        }
+        if (max_val < 1e-6) {
+            return 0.0f;
+        }
+
+        if (max_row != i) {
+            det *= -1.0f;
+            swap_rows(clone, i, max_row);
+        }
+        
+        f32 pivot = clone->data[get_index(clone->cols, i, i)];
+
+        for (sz j = i + 1; j < n; j++) {
+            f32 factor = clone->data[get_index(clone->cols, j, i)] / pivot;
+            for (sz k = i; k < n; k++) {
+                sz target_idx = get_index(clone->cols, j, k);
+                sz pivot_idx = get_index(clone->cols, i, k);
+                clone->data[target_idx] -= factor * clone->data[pivot_idx];
+            }
+        }
+    }
+    for (sz i = 0; i < n; i++) {
+        det *= clone->data[get_index(clone->cols, i, i)];
+    }
+    return det;
 }

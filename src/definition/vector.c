@@ -1,4 +1,6 @@
+#include "base.h"
 #include "definitions.h"
+#include <stdio.h>
 #include "vector.h"
 
 LVector vector_create(Arena arena, sz size) {
@@ -6,10 +8,17 @@ LVector vector_create(Arena arena, sz size) {
     if (!v) terminate("Couldn't allocate vector.");
 
     v->size = size;
-    v->data = PUSH_ARRAY(arena, i16, size, true);
+    v->data = PUSH_ARRAY(arena, f32, size, true);
     if (!v->data) terminate("Couldn't allocate vector array.");
 
     return v;
+}
+
+void vector_insert(LVector v) {
+    printf("Enter values for a size %zu vector:\n", v->size);
+    for (sz i = 0; i < v->size; i ++) {
+        scanf("%f", &v->data[i]);
+    }
 }
 
 LVector vector_add(Arena arena, LVector a, LVector b) {
@@ -32,8 +41,8 @@ LVector vector_multiply(Arena arena, LVector a, i16 k) {
     return v;
 }
 
-i16 inner_product(LVector a, LVector b) {
-    i16 result = 0;
+f32 inner_product(LVector a, LVector b) {
+    f32 result = 0.0;
     for (sz i = 0; i < a->size; i++) {
         result += a->data[i] * b->data[i];
     }
@@ -41,8 +50,26 @@ i16 inner_product(LVector a, LVector b) {
     return result;
 }
 
+LVector vector_cross(Arena arena, LVector u, LVector v) {
+    if (u->size != 3 || v->size != 3) terminate("Standard cross product is only defined for 3D vectors.");
+
+    LVector result = vector_create(arena, 3);
+
+    result->data[0] = u->data[1] * v->data[2] - u->data[2] * v->data[1];
+    result->data[1] = u->data[2] * v->data[0] - u->data[0] * v->data[2];
+    result->data[2] = u->data[0] * v->data[1] - u->data[1] * v->data[0];
+
+    return result;
+}
+
 void vector_scale(LVector v, i16 scalar) {
     for (sz i = 0; i < v->size; i++) {
         v->data[i] *= scalar;
+    }
+}
+
+void vector_print(LVector v) {
+    for (sz i = 0; i < v->size; i++) {
+        printf("%.2f ", v->data[i]);
     }
 }

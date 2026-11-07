@@ -5,10 +5,10 @@
 struct matrix_type {
     sz rows;
     sz cols;
-    i16 *data;
+    f32 *data;
 };
 
 struct vector_type {
     sz size;
-    i16* data;
+    f32* data;
 };
