@@ -1,5 +1,6 @@
 #include "base.h"
 #include "definitions.h"
+#include "random.h"
 #include <math.h>
 #include "matrix.h"
 
@@ -40,8 +41,7 @@ LMatrix matrix_create(Arena arena, sz rows, sz cols) {
 void matrix_generate(LMatrix m) {
     for (u8 i = 0; i < m->rows; i++) {
         for (u8 j = 0; j < m->cols; j++) {
-            u8 index = get_index(m->cols, i, j);
-            m->data[index] = (rand() % 20) + j * (i - 1);
+            m->data[get_index(m->cols, i, j)] = (prng_rand() % 30)/* \* ((i - j) \* -1)*/;
         }
     }
 }

@@ -2,7 +2,7 @@
 #include "definitions.h"
 
 LMatrix vec_to_mat(Arena arena, LVector v) {
-    LMatrix m = matrix_create(arena, v->size, v->size);
+    LMatrix m = matrix_create(arena, v->size, 1);
     for (sz i = 0; i < m->rows; i++) {
         m->data[get_index(m->cols, i, 0)] = v->data[i];
     }
@@ -18,9 +18,8 @@ LVector mat_to_vec(Arena arena, LMatrix m) {
 }
 
 LVector lin_transform(Arena arena, LMatrix t, LVector vec) {
-    LMatrix resulting = matrix_create(arena, vec->size, 1);
     LMatrix mat = vec_to_mat(arena, vec);
-    resulting = matrix_multiply(arena, t, mat);
+    LMatrix resulting = matrix_multiply(arena, t, mat);
     LVector final = mat_to_vec(arena, resulting);
 
     return final;

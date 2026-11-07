@@ -15,7 +15,7 @@ LVector vector_create(Arena arena, sz size) {
 }
 
 void vector_insert(LVector v) {
-    printf("Enter values for a size %zu vector:\n", v->size);
+    printf("Enter values for a size %zu vector: ", v->size);
     for (sz i = 0; i < v->size; i ++) {
         scanf("%f", &v->data[i]);
     }

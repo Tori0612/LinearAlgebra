@@ -131,5 +131,24 @@
     ],
     "directory": "/home/tori/projects/linalg",
     "output": "build/obj/definition/vector.o"
+  },
+  {
+    "file": "src/random.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-O0",
+      "-MMD",
+      "-MP",
+      "-I./include",
+      "-c",
+      "src/random.c",
+      "-o",
+      "build/obj/random.o"
+    ],
+    "directory": "/home/tori/projects/linalg",
+    "output": "build/obj/random.o"
   }
 ]
