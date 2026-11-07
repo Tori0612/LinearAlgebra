@@ -1,4 +1,5 @@
 #include "operations.h"
+#include "definitions.h"
 #include <stdio.h>
 
 void do_cross(Arena arena) {
@@ -30,5 +31,19 @@ void do_determinant(Arena arena) {
     LMatrix matrix = matrix_create(arena, dim, dim);
     matrix_insert(matrix);
     f32 det = matrix_determinant(arena, matrix);
-    printf("Det: %.2f", det);
+    printf("Det: %.2f\n", det);
+}
+
+void do_transformation(Arena arena) {
+    sz dim;
+    printf("Enter the transformation dimension (e.g. 2): ");
+    scanf("%zu", &dim);
+    LMatrix matrix = matrix_create(arena, dim, dim);
+    matrix_insert(matrix);
+    LVector vec = vector_create(arena, dim);
+    vector_insert(vec);
+    LVector result = lin_transform(arena, matrix, vec);
+    for (sz i = 0; i < result->size; i++) {
+        printf("%.2f\n", result->data[i]);
+    }
 }

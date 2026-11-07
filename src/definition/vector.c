@@ -72,4 +72,5 @@ void vector_print(LVector v) {
     for (sz i = 0; i < v->size; i++) {
         printf("%.2f ", v->data[i]);
     }
+    printf("\n");
 }

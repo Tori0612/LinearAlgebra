@@ -52,6 +52,7 @@ void* arena_push(Arena arena, u64 size, b32 non_zero);
 void arena_pop(Arena arena, u64 size);
 void arena_pop_to(Arena arena, u64 pos);
 void arena_clear(Arena arena);
+void arena_print_usage(Arena arena);
 
 #define PUSH_STRUCT(arena, T, zero) ((T*)arena_push((arena), sizeof(T), zero))
 #define PUSH_ARRAY(arena, T, n, zero) ((T*)arena_push((arena), sizeof(T) * (n), zero))

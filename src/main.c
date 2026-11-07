@@ -5,6 +5,7 @@
 
 int main(void) {
     Arena arena = arena_create(MiB(5));
-    do_determinant(arena);
+    do_transformation(arena);
+    arena_print_usage(arena);
     return 0;
 }

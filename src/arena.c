@@ -1,4 +1,5 @@
 #include "base.h"
+#include <stdio.h>
 #include <string.h>
 
 Arena arena_create(u64 capacity) {
@@ -42,4 +43,15 @@ void arena_pop_to(Arena arena, u64 pos) {
 
 void arena_clear(Arena arena) {
     arena_pop_to(arena, ARENA_BASE_POS);
+}
+
+void arena_print_usage(Arena arena) {
+    u64 used = arena->pos;
+    u64 capacity = arena->capacity;
+    f32 percent = ((f32)used / (f32)capacity) * 100.0f;
+
+    printf("[Arena Memory] %llu / %llu bytes used (%.2f%%)\n",
+            (unsigned long long)used,
+            (unsigned long long)capacity,
+            percent);
 }
