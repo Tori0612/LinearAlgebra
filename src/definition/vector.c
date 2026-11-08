@@ -68,9 +68,12 @@ void vector_scale(LVector v, i16 scalar) {
     }
 }
 
-void vector_print(LVector v) {
+void vector_print(LVector v, char c) {
+    printf("Vector %c: (", c);
     for (sz i = 0; i < v->size; i++) {
-        printf("%.2f ", v->data[i]);
+        printf("%.2f", v->data[i]);
+
+        if (i < v->size - 1) printf(", ");
     }
-    printf("\n");
+    printf(")\n");
 }

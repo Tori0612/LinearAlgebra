@@ -2,6 +2,7 @@
 #include "definitions.h"
 #include "random.h"
 #include <math.h>
+#include <string.h>
 #include "matrix.h"
 
 sz get_index(sz cols, u8 i, u8 j) {
@@ -104,7 +105,18 @@ void matrix_insert(LMatrix m) {
     }
 }
 
-LMatrix matrix_add(Arena arena, LMatrix a, LMatrix b) {
+void matrix_copy(LMatrix dst, const LMatrix src) {
+    if (dst->rows != src->rows || dst->cols != src->cols) {
+        terminate("Can't copy a matrix into another of different dimension.");
+    }
+    memcpy(dst->data, src->data, sizeof(f32) * (u64)dst->rows * dst->cols);
+}
+
+void matrix_clear(LMatrix m) {
+    memset(m->data, 0, sizeof(f32) * (u64)m->rows * m->cols);
+}
+
+LMatrix matrix_add(Arena arena, const LMatrix a, const LMatrix b) {
     if (a->rows != b->rows || a->cols != b->cols) {
         terminate("You cant add matrices of different dimensions.");
     }
@@ -118,19 +130,76 @@ LMatrix matrix_add(Arena arena, LMatrix a, LMatrix b) {
     return m;
 }
 
-LMatrix matrix_multiply(Arena arena, LMatrix a, LMatrix b) {
-    if (a->cols != b->rows) terminate("The number of cols of A should be equal to the number of rows of B");
-    LMatrix m = matrix_create(arena, a->rows, b->cols);
-    for (u8 i = 0; i < m->rows; i++) {
-        for (u8 j = 0; j < m->cols; j++) {
-            u8 m_index = get_index(m->cols, i, j);
-            for (u8 k = 0; k < b-> rows; k++) {
-                u8 a_index = get_index(a->cols, i, k);
-                u8 b_index = get_index(b->cols, k, j);
-                m->data[m_index] += a->data[a_index] * b->data[b_index];
+static void _matrix_mul_nn(LMatrix out, const LMatrix a, const LMatrix b) {
+    for (u64 i = 0; i < out->rows; i++) {
+        for (u64 k = 0; k < a->cols; k++) {
+            for (u64 j = 0; j < out->cols; j++) {
+                out->data[get_index(out->cols, i, j)] +=
+                a->data[get_index(a->cols, i, k)] *
+                b->data[get_index(b->cols, k, j)];
             }
         }
     }
+}
+
+static void _matrix_mul_nt(LMatrix out, const LMatrix a, const LMatrix b) {
+    for (u64 i = 0; i < out->rows; i++) {
+        for (u64 j = 0; j < out->cols; j++) {
+            for (u64 k = 0; k < a->cols; k++) {
+                out->data[get_index(out->cols, i, j)] +=
+                a->data[get_index(a->cols, i, k)] *
+                b->data[get_index(b->cols, j, k)];
+            }
+        }
+    }
+}
+
+static void _matrix_mul_tn(LMatrix out, const LMatrix a, const LMatrix b) {
+    for (u64 k = 0; k < a->rows; k++) {
+        for (u64 i = 0; i < out->rows; i++) {
+            for (u64 j = 0; j < out->cols; j++) {
+                out->data[get_index(out->cols, i, j)] +=
+                a->data[get_index(a->cols, k, i)] *
+                b->data[get_index(b->cols, k, j)];
+            }
+        }
+    }
+}
+
+static void _matrix_mul_tt(LMatrix out, const LMatrix a, const LMatrix b) {
+    for (u64 i = 0; i < out->rows; i++) {
+        for (u64 j = 0; j < out->cols; j++) {
+            for (u64 k = 0; k < a->cols; k++) {
+                out->data[get_index(out->cols, i, j)] +=
+                a->data[get_index(a->cols, k, i)] *
+                b->data[get_index(b->cols, j, k)];
+            }
+        }
+    }
+}
+
+LMatrix matrix_multiply(Arena arena, const LMatrix a, const LMatrix b,
+    b8 zero_out, b32 transpose_a, b32 transpose_b
+) {
+    u32 a_rows = transpose_a ? a->cols : a->rows;
+    u32 a_cols = transpose_a ? a->rows : a->cols;
+    u32 b_rows = transpose_b ? b->cols : b->rows;
+    u32 b_cols = transpose_b ? b->rows : b->cols;
+
+    if (a_cols != b_rows) terminate("The number of cols of A should be equal to the number of rows of B");
+    LMatrix m = matrix_create(arena, a_rows, b_cols);
+
+    if (zero_out) { matrix_clear(m); }
+
+    u32 transpose = (transpose_a << 1) | transpose_b;
+
+    switch (transpose) {
+        case 0b00: { _matrix_mul_nn(m, a, b); } break;
+        case 0b01: { _matrix_mul_nt(m, a, b); } break;
+        case 0b10: { _matrix_mul_tn(m, a, b); } break;
+        case 0b11: { _matrix_mul_tt(m, a, b); } break;
+    }
+
     return m;
 }
 
@@ -197,7 +266,7 @@ f32 matrix_determinant(Arena arena, LMatrix m) {
     return det;
 }
 
-LMatrix matrix_image(Arena arena, LMatrix m) {
+LMatrix matrix_image(Arena arena, const LMatrix m) {
     LMatrix rref = matrix_rref(arena, m);
 
     b32* is_pivot_col = PUSH_ARRAY(arena, b32, m->cols, true);
@@ -230,7 +299,7 @@ LMatrix matrix_image(Arena arena, LMatrix m) {
     return image;
 }
 
-LMatrix matrix_kernel(Arena arena, LMatrix m) {
+LMatrix matrix_kernel(Arena arena, const LMatrix m) {
     LMatrix rref = matrix_rref(arena, m);
 
     b32* is_pivot_col = PUSH_ARRAY(arena, b32, m->cols, true);

@@ -19,14 +19,16 @@ LVector mat_to_vec(Arena arena, LMatrix m) {
 
 LVector lin_transform(Arena arena, LMatrix t, LVector vec) {
     LMatrix mat = vec_to_mat(arena, vec);
-    LMatrix resulting = matrix_multiply(arena, t, mat);
+    LMatrix resulting = matrix_multiply(arena, t, mat, true, false, false);
     LVector final = mat_to_vec(arena, resulting);
 
     return final;
 }
 
-LVector* kernel(Arena arena, LMatrix t) {
-    // find the vect
-}
+// LVector* lin_kernel(Arena arena, LMatrix m) {
+//     LMatrix kernel_list = matrix_kernel(arena, m);
+// }
 
-LVector* image(Arena arena, LMatrix t);
+// LVector* lin_image(Arena arena, LMatrix m) {
+//     LMatrix image_list = matrix_image(arena, m);
+// }
