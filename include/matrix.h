@@ -12,4 +12,7 @@ LMatrix matrix_multiply(Arena arena, LMatrix a, LMatrix b);
 void matrix_scale(LMatrix m, i16 scalar);
 f32 matrix_determinant(Arena arena, LMatrix m);
 
+LMatrix matrix_image(Arena arena, LMatrix m);
+LMatrix matrix_kernel(Arena arena, LMatrix m);
+
 void matrix_print(LMatrix m);

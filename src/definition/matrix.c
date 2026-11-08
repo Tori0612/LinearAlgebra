@@ -20,6 +20,52 @@ static void swap_rows(LMatrix m, sz row1, sz row2) {
     }
 }
 
+static LMatrix matrix_rref(Arena arena, LMatrix m) {
+    LMatrix rref = matrix_create(arena, m->rows, m->cols);
+    for (sz i = 0; i < m->rows * m->cols; i++) {
+        rref->data[i] = m->data[i];
+    }
+
+    sz r = 0;
+    sz c = 0;
+
+    while (r < rref->rows && c < rref->cols) {
+        sz max_r = r;
+        f32 max_val = fabs(rref->data[get_index(rref->cols, r, c)]);
+
+        for (sz i = r + 1; i < rref->rows; i++) {
+            f32 val = fabs(rref->data[get_index(rref->cols, i, c)]);
+            if (val > max_val) {
+                max_val = val;
+                max_r = i;
+            }
+        }
+        if (max_val < 1e-6) {
+            c++;
+            continue;
+        }
+
+        if (max_r != r) { swap_rows(rref, r, max_r); }
+
+        f32 pivot = rref->data[get_index(rref->cols, r, c)];
+        for (sz j = c; j < rref->cols; j++) {
+            rref->data[get_index(rref->cols, r, j)] /= pivot;
+        };
+
+        for (sz i = 0; i < rref->rows; i++) {
+            if (i == r) continue;
+
+            f32 factor = rref->data[get_index(rref->cols, i, c)];
+            for (sz j = c; j < rref->cols; j++) {
+                rref->data[get_index(rref->cols, i, j)] -= factor * rref->data[get_index(rref->cols, r, j)];
+            }
+        }
+        r++;
+        c++;
+    }
+    return rref;
+}
+
 LMatrix matrix_create(Arena arena, sz rows, sz cols) {
     LMatrix m = PUSH_STRUCT(arena, struct matrix_type, true);
 
@@ -95,17 +141,6 @@ void matrix_scale(LMatrix m, i16 scalar) {
     }
 }
 
-void matrix_print(LMatrix m) {
-    for (u8 i = 0; i < m->rows; i++) {
-        for (u8 j = 0; j < m->cols; j++) {
-            u8 index = get_index(m->cols, i, j);
-            printf("%.2f  ", m->data[index]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-}
-
 f32 matrix_determinant(Arena arena, LMatrix m) {
     if (m->rows != m->cols) terminate("Determinant can only be calculated for square matrices.");
 
@@ -161,3 +196,92 @@ f32 matrix_determinant(Arena arena, LMatrix m) {
     }
     return det;
 }
+
+LMatrix matrix_image(Arena arena, LMatrix m) {
+    LMatrix rref = matrix_rref(arena, m);
+
+    b32* is_pivot_col = PUSH_ARRAY(arena, b32, m->cols, true);
+    sz rank = 0;
+
+    for (sz i = 0; i < rref->rows; i++) {
+        for (sz j = 0; j < rref->cols; j++) {
+            if (fabs(rref->data[get_index(rref->cols, i, j)]) > 1e-6) {
+                is_pivot_col[j] = 1;
+                rank++;
+                break;
+            }
+        }
+    }
+    if (rank == 0) {
+        return matrix_create(arena, m->rows, 0);
+    }
+
+    LMatrix image = matrix_create(arena, m->rows, rank);
+    sz current_img_col = 0;
+
+    for (sz j = 0; j < m->cols; j++) {
+        if (is_pivot_col[j]) {
+            for (sz i = 0; i < m->rows; i++) {
+                image->data[get_index(image->cols, i, current_img_col)] = m->data[get_index(m->cols, i, j)];
+            }
+            current_img_col++;
+        }
+    }
+    return image;
+}
+
+LMatrix matrix_kernel(Arena arena, LMatrix m) {
+    LMatrix rref = matrix_rref(arena, m);
+
+    b32* is_pivot_col = PUSH_ARRAY(arena, b32, m->cols, true);
+    sz* pivot_row_for_col = PUSH_ARRAY(arena, sz, m->cols, true);
+    sz rank = 0;
+
+    for (sz i = 0; i < rref->rows; i++) {
+        for (sz j = 0; j < rref->cols; j++) {
+            if (fabs(rref->data[get_index(rref->cols, i, j)]) > 1e-6) {
+                is_pivot_col[j] = 1;
+                pivot_row_for_col[j] = i;
+                rank++;
+                break;
+            }
+        }
+    }
+
+    sz nullity = m->cols - rank;
+
+    if (nullity == 0) {
+        return matrix_create(arena, m->cols, 1);
+    }
+
+    LMatrix kernel = matrix_create(arena, m->cols, nullity);
+    sz current_free_idx = 0;
+
+    for (sz j = 0; j < m->cols; j++) {
+        if (!is_pivot_col[j]) {
+            kernel->data[get_index(kernel->cols, j, current_free_idx)] = 1.0f;
+
+            for (sz p = 0; p < m->cols; p++) {
+                if (is_pivot_col[p]) {
+                    sz pivot_row = pivot_row_for_col[p];
+                    f32 val = -rref->data[get_index(rref->cols, pivot_row, j)];
+                    kernel->data[get_index(kernel->cols, p, current_free_idx)] = val;
+                }
+            }
+            current_free_idx++;
+        }
+    }
+    return kernel;
+}
+
+void matrix_print(LMatrix m) {
+    for (u8 i = 0; i < m->rows; i++) {
+        for (u8 j = 0; j < m->cols; j++) {
+            u8 index = get_index(m->cols, i, j);
+            printf("%.2f  ", m->data[index]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+

@@ -24,3 +24,9 @@ LVector lin_transform(Arena arena, LMatrix t, LVector vec) {
 
     return final;
 }
+
+LVector* kernel(Arena arena, LMatrix t) {
+    // find the vect
+}
+
+LVector* image(Arena arena, LMatrix t);
